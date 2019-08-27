@@ -38,31 +38,46 @@ public class BookShopping extends HttpServlet {
 		Connection con = DBConnection.getDBInstance();
 		DBUtility.useDB(con, "onlinebooks");
 
-		String query, selectQuery;
+		String query, selectQuery, type, title, author, publisher, publicationYear, price;
+
+		type = (String) request.getParameter("type");
+		title = (String) request.getParameter("title");
+		author = (String) request.getParameter("author");
+		publisher = (String) request.getParameter("publisher");
+		publicationYear = (String) request.getParameter("publicationYear");
+		price = (String) request.getParameter("price");
 
 		ResultSet rs;
 		response.setContentType("text/html");
 
-
 		selectQuery = "SELECT * FROM `onlinebooks`.`books`;";
 
-		query = "INSERT INTO `onlinebooks`.`books` (`title`, `author`, `publisher`, `publication_year`, `price`) VALUES ('Green Eggs and Ham', 'Mel Gibson', 'Shakira', '1999', '$20')";
-		DBUtility.executeUpdate(con, query);
-		rs = DBUtility.executeQuery(con, selectQuery);
-		response.getWriter().append("<h1>"+DBUtility.printEntireRS(rs)+"</h1><br/><br/>");
+		if (type.equals("insert")) {
+			query = "INSERT INTO `onlinebooks`.`books` (`title`, `author`, `publisher`, `publication_year`, `price`) VALUES ('"
+					+ title + "', '" + author + "', '" + publisher + "', '" + publicationYear + "', '" + price + "')";
+			if (DBUtility.executeUpdate(con, query)) {
+				rs = DBUtility.executeQuery(con, selectQuery);
+				response.getWriter().append("<h3>" + DBUtility.printEntireRS(rs) + "</h3>");
+			} else
+				response.getWriter().append("<meta http-equiv='refresh' content='2;URL=BookShopping.jsp'><h1 style='color:red;'>Book Not Inserted!</h1>");
+		} else if (type.equals("update")) {
+			query = "UPDATE `onlinebooks`.`books` SET `publisher` = '" + publisher + "' WHERE (`title` = '" + title
+					+ "');";
+			if (DBUtility.executeUpdate(con, query)) {
+				rs = DBUtility.executeQuery(con, selectQuery);
+				response.getWriter().append("<h3>" + DBUtility.printEntireRS(rs) + "</h3>");
+			} else
+				response.getWriter().append("<meta http-equiv='refresh' content='2;URL=BookShopping.jsp'><h1 style='color:red;'>Book Not Updated!</h1>");
+		} else if (type.equals("delete")) {
+			query = "DELETE FROM `onlinebooks`.`books` WHERE (`title` = '"+title+"');";
+			if (DBUtility.executeUpdate(con, query)) {
+				rs = DBUtility.executeQuery(con, selectQuery);
+				response.getWriter().append("<h3>" + DBUtility.printEntireRS(rs) + "</h3>");
+			} else
+				response.getWriter().append("<meta http-equiv='refresh' content='2;URL=BookShopping.jsp'><h1 style='color:red;'>Book Not Deleted!</h1>");
+		} else
+			response.getWriter().append("<h1 style='color:red>Someone Done goofed!</h1>");
 
-
-
-		query = "UPDATE `onlinebooks`.`books` SET `publisher` = 'Shaq' WHERE (`title` = 'Green Eggs and Ham');";
-		DBUtility.executeUpdate(con, query);
-		rs = DBUtility.executeQuery(con, selectQuery);
-		response.getWriter().append("<h1>"+DBUtility.printEntireRS(rs)+"</h1><br/><br/>");
-
-
-		query = "DELETE FROM `onlinebooks`.`books` WHERE (`title` = 'Green Eggs and Ham');";
-		DBUtility.executeUpdate(con, query);
-		rs = DBUtility.executeQuery(con, selectQuery);
-		response.getWriter().append("<h1>"+DBUtility.printEntireRS(rs)+"</h1><br/><br/>");
 	}
 
 	/**

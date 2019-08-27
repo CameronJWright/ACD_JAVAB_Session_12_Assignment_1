@@ -23,18 +23,19 @@ public class DBUtility {
 	}
 
 	public static String printEntireRS(ResultSet rs) {
-		String str;
+		String str = "";
 		ResultSetMetaData rsmd;
 
 		try {
 			rsmd = rs.getMetaData();
 			while (rs.next()) {
-				str = ": ";
+				str = str + "<br/>: ";
 				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 					str = str + (rs.getString(i) + " : ");
 				}
-				return str;
 			}
+			return str;
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
